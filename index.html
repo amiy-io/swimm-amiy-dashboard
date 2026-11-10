@@ -327,7 +327,7 @@
   function ago(t){var s=(Date.now()-new Date(t))/1000;if(s<3600)return Math.max(1,Math.round(s/60))+" min ago";if(s<86400)return Math.round(s/3600)+"h ago";return Math.round(s/86400)+" days ago";}
   var FORMER={};
   function key(n){return String(n||"").normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase().replace(/\s+/g," ").trim();}
-  var ALIAS={"fat g":"Fat Goska","alex":"Alexandro","adi h":"Adi Hasaković"};
+  var ALIAS={"sean k":"Altin Krasniqi","fat g":"Fat Goska","alex":"Alexandro","adi h":"Adi Hasaković"};
   function team(n){var k=key(n);if(FORMER[k])return "Former SDRs";return ALIAS[k]||n||"Unknown";}
   function outKey(m){if(m.status)return m.status;return (m.meeting&&m.meeting>=nowStr())?"_up":"_aw";}
 
