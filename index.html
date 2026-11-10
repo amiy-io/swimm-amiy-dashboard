@@ -472,7 +472,7 @@
         '<td>'+esc(m.sdr)+'</td><td>'+nice(m.booked)+'</td><td>'+niceT(m.meeting)+'</td><td><span class="tag '+o.t+'">'+o.l+'</span></td></tr>';
     }).join(""):'<tr><td colspan="5" class="empty">No meetings here. Try a longer date range.</td></tr>';
 
-    var errs=(D.errors||[]).filter(function(e){return !/users list/i.test(e);});
+    var errs=(D.errors||[]).filter(function(e){return !/users list|stage |contact_stages|outcome_names|call-outcome/i.test(e);});
     var notes=[];
     if(D.meetings==null)notes.push("Meetings couldn't be loaded from EMET on the last refresh. Calls and emails are current.");
     else if(errs.length)notes.push("Last refresh notes: "+errs.join("; "));
