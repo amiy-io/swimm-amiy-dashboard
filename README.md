@@ -29,4 +29,4 @@ Open the latest run under Actions. A red "Refuse to deploy" step means Apollo di
 
 ## Vercel env vars (already set on the project)
 
-`APOLLO_SWIMM_KEY`, `SWIMM_SECRET`, `SWIMM_USERS`, `SWIMM_DATA_KEY`, and optionally `CRON_SECRET`. `SWIMM_USERS` controls who can log in.
+`APOLLO_SWIMM_KEY`, `SWIMM_SECRET`, `SWIMM_USERS`, `SWIMM_DATA_KEY`, and optionally `CRON_SECRET`. `SWIMM_USERS` and `SWIMM_USERS_EXTRA` control who can log in. Add new people to `SWIMM_USERS_EXTRA`, separated by `;`.

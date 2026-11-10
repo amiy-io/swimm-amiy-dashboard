@@ -49,7 +49,7 @@ def config_error() -> str:
 # ── users ─────────────────────────────────────────────────────────────────────
 def load_users() -> dict:
     """{email_lower: (iterations, salt_hex, hash_hex)}"""
-    raw = os.environ.get("SWIMM_USERS", "")
+    raw = os.environ.get("SWIMM_USERS", "") + ";" + os.environ.get("SWIMM_USERS_EXTRA", "")
     out = {}
     for rec in raw.replace("\n", ";").split(";"):
         parts = [p.strip() for p in rec.strip().split("|")]
