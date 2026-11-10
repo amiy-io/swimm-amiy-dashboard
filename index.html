@@ -70,6 +70,29 @@
   .stage .c{font-size:12px;font-weight:600;color:rgba(255,255,255,.5);margin-top:2px}
   .stage.last .v{color:var(--yellow)}
 
+  .strip{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-top:16px}
+  @media(max-width:900px){.strip{grid-template-columns:repeat(2,1fr)}}
+  .sbox{background:#fff;border:1px solid var(--mist);border-radius:18px;padding:16px 20px}
+  .sbox .v{font-size:26px;font-weight:800;letter-spacing:-.02em;line-height:1.1}
+  .sbox .l{font-size:13px;font-weight:600;color:var(--slate);margin-top:4px}
+  .chart{padding:8px 24px 18px}
+  .bars{display:flex;align-items:flex-end;gap:4px;height:170px;border-bottom:1px solid var(--mist)}
+  .bars .b{flex:1;display:flex;flex-direction:column;justify-content:flex-end;height:100%;position:relative;cursor:default}
+  .bars .b span{display:block;border-radius:4px 4px 0 0;background:#c9dbef}
+  .bars .b span.cn{background:var(--blue);border-radius:0}
+  .bars .b.we span{background:#e7edf5}
+  .bars .b.we span.cn{background:#8fb0d6}
+  .bars .b:hover span{filter:brightness(.92)}
+  .bars .b .tip{display:none;position:absolute;bottom:calc(100% + 6px);left:50%;transform:translateX(-50%);background:var(--ink);color:#fff;font-size:12px;font-weight:700;padding:6px 9px;border-radius:8px;white-space:nowrap;z-index:2}
+  .bars .b:hover .tip{display:block}
+  .axis{display:flex;justify-content:space-between;font-size:11.5px;font-weight:600;color:var(--faint);margin-top:8px}
+  .key{display:flex;gap:16px;font-size:12.5px;font-weight:700;color:var(--slate)}
+  .key i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:6px;vertical-align:-1px}
+  .dchips{display:flex;flex-wrap:wrap;gap:6px;padding:12px 24px;border-bottom:1px solid var(--mist);background:var(--paper)}
+  .dchips[hidden]{display:none}
+  .dchip{border:1px solid var(--mist);background:#fff;border-radius:999px;padding:5px 12px;font-size:12.5px;font-weight:700;color:var(--ink-2);cursor:pointer}
+  .dchip.on{background:var(--blue);border-color:var(--blue);color:#fff}
+  .dchip b{opacity:.65;margin-left:5px}
   .warn{margin:16px 0 0;background:#fff7d6;border-radius:14px;padding:12px 16px;font-size:13px;font-weight:600;color:#6b5600}
   .warn[hidden]{display:none}
 
@@ -229,6 +252,18 @@
 
     <div class="warn" id="warn" hidden></div>
 
+    <div class="strip">
+      <div class="sbox"><div class="v" id="s-sdrs">0</div><div class="l">Active SDRs in this range</div></div>
+      <div class="sbox"><div class="v" id="s-seq">0</div><div class="l">Sequences in Apollo</div></div>
+      <div class="sbox"><div class="v" id="s-talk">0m</div><div class="l">Talk time</div></div>
+      <div class="sbox"><div class="v" id="s-rep">0</div><div class="l">Email replies</div></div>
+    </div>
+
+    <section class="panel" style="margin-top:16px">
+      <div class="ph"><h2>Dials per day</h2><div class="key"><span><i style="background:#c9dbef"></i>Calls</span><span><i style="background:var(--blue)"></i>Conversations</span></div></div>
+      <div class="chart"><div class="bars" id="bars"></div><div class="axis" id="axis"></div></div>
+    </section>
+
     <div class="row">
       <section class="panel">
         <div class="ph"><h2>What happened to the meetings</h2><span class="note" id="out-note"></span></div>
@@ -269,6 +304,8 @@
             <th data-k="connected" class="num">Conversations</th>
             <th data-k="cr" class="num">Connect rate</th>
             <th data-k="perday" class="num">Per day</th>
+            <th data-k="days" class="num">Active days</th>
+            <th data-k="share" class="num">Share of calls</th>
             <th data-k="secs" class="num">Talk time</th>
           </tr></thead>
           <tbody></tbody>
@@ -294,6 +331,7 @@
 <div class="back" id="cc" hidden>
   <div class="modal" role="dialog" aria-modal="true" aria-labelledby="cc-t">
     <div class="mh"><div><div class="tt" id="cc-t"></div><div class="ss" id="cc-s"></div></div><button class="x" id="cc-x" aria-label="Close">&times;</button></div>
+    <div class="dchips" id="cc-f" hidden></div>
     <div class="mb">
       <table><thead><tr><th class="ns">When</th><th class="ns">Contact</th><th class="ns num">Length</th><th class="ns">Outcome</th><th class="ns">Notes</th><th class="ns">Recording</th></tr></thead><tbody id="cc-b"></tbody></table>
     </div>
@@ -458,7 +496,7 @@
     var cb={};
     cs.forEach(function(x){var n=team(x.sdr),s=cb[n]||(cb[n]={sdr:n,calls:0,connected:0,secs:0,days:0});s.calls+=x.count;s.connected+=(x.connected||0);s.secs+=(x.secs||0);s.days++;});
     (D.team||[]).forEach(function(n){var t=team(n);if(!cb[t])cb[t]={sdr:t,calls:0,connected:0,secs:0,days:0};});
-    var cl=sortRows(Object.keys(cb).map(function(k){var s=cb[k];s.perday=s.days?Math.round(s.calls/s.days):0;s.cr=pct(s.connected,s.calls);return s;}),sC);
+    var cl=sortRows(Object.keys(cb).map(function(k){var s=cb[k];s.perday=s.days?Math.round(s.calls/s.days):0;s.cr=pct(s.connected,s.calls);s.share=tc?Math.round(s.calls/tc*1000)/10:0;return s;}),sC);
     var maxC=cl.reduce(function(a,s){return Math.max(a,s.calls);},1);
     $("tc").querySelector("tbody").innerHTML=cl.length?cl.map(function(s,i){
       var fm=s.sdr==="Former SDRs";
@@ -466,8 +504,8 @@
       return '<tr'+(fm?' style="opacity:.6"':'')+'><td class="who"><span class="rank">'+(fm?"":i+1)+'</span>'+esc(s.sdr)+mail+'</td>'+
         '<td><div class="meter"><div class="tr"><span style="width:'+Math.max(3,s.calls/maxC*100)+'%"></span></div><span class="pc">'+fmt(s.calls)+'</span></div></td>'+
         '<td class="num">'+(s.connected&&!fm?'<a href="#" class="conn" data-sdr="'+esc(s.sdr)+'">'+fmt(s.connected)+'</a>':fmt(s.connected))+'</td>'+
-        '<td class="num">'+s.cr+'%</td><td class="num">'+s.perday+'</td><td class="num">'+hm(s.secs)+'</td></tr>';
-    }).join(""):'<tr><td colspan="6" class="empty">No calls in this range</td></tr>';
+        '<td class="num">'+s.cr+'%</td><td class="num">'+s.perday+'</td><td class="num">'+s.days+'</td><td class="num">'+s.share+'%</td><td class="num">'+hm(s.secs)+'</td></tr>';
+    }).join(""):'<tr><td colspan="8" class="empty">No calls in this range</td></tr>';
 
     var shown=M.filter(function(m){return !filter||outKey(m)===filter;});
     var fo=filter?OUT.filter(function(o){return o.k===filter;})[0]:null;
@@ -480,6 +518,25 @@
       return '<tr><td class="who">'+esc(m.company)+'<span class="sub">'+esc(m.contact)+(m.title?", "+esc(m.title):"")+'</span></td>'+
         '<td>'+esc(m.sdr)+'</td><td>'+nice(m.booked)+'</td><td>'+niceT(m.meeting)+'</td><td><span class="tag '+o.t+'">'+o.l+'</span></td></tr>';
     }).join(""):'<tr><td colspan="5" class="empty">No meetings here. Try a longer date range.</td></tr>';
+
+    var days={},tsec=0,trep2=0,act={};
+    cs.forEach(function(x){var d=days[x.date]||(days[x.date]={c:0,n:0});d.c+=x.count;d.n+=(x.connected||0);tsec+=(x.secs||0);if(x.count&&team(x.sdr)!=="Former SDRs")act[team(x.sdr)]=1;});
+    es.forEach(function(x){trep2+=(x.replied||0);});
+    M.forEach(function(m){if(team(m.sdr)!=="Former SDRs")act[team(m.sdr)]=1;});
+    $("s-sdrs").textContent=fmt(Object.keys(act).length);
+    $("s-seq").textContent=fmt(D.sequences);
+    $("s-talk").textContent=hm(tsec);
+    $("s-rep").textContent=fmt(trep2);
+    var lo=r.lo||D.date_min,hi=r.hi,list=[];
+    for(var dd=new Date(lo+"T12:00:00");iso(dd)<=hi;dd.setDate(dd.getDate()+1))list.push(iso(dd));
+    if(list.length>120)list=list.slice(-120);
+    var mxd=list.reduce(function(a,d){return Math.max(a,(days[d]||{}).c||0);},1);
+    $("bars").innerHTML=list.map(function(d){
+      var v=days[d]||{c:0,n:0},wd=new Date(d+"T12:00:00").getDay(),we=(wd===0||wd===6);
+      return '<div class="b'+(we?" we":"")+'"><div class="tip">'+nice(d)+": "+fmt(v.c)+" calls, "+fmt(v.n)+" conversations</div>"+
+        '<span style="height:'+((v.c-v.n)/mxd*100)+'%"></span><span class="cn" style="height:'+(v.n/mxd*100)+'%"></span></div>';
+    }).join("");
+    $("axis").innerHTML=list.length?"<span>"+nice(list[0])+"</span><span>"+nice(list[Math.floor(list.length/2)])+"</span><span>"+nice(list[list.length-1])+"</span>":"";
 
     var errs=(D.errors||[]).filter(function(e){return !/users list|stage |contact_stages|outcome_names|call-outcome/i.test(e);});
     var notes=[];
@@ -533,9 +590,19 @@
   $("tc").addEventListener("click",function(e){
     var a=e.target.closest(".conn");if(!a)return;e.preventDefault();
     var r=range(),sdr=a.dataset.sdr;
-    var rows=(D.connected_calls||[]).filter(function(c){return c.sdr===sdr&&inR(c.date,r);});
+    ccRows=(D.connected_calls||[]).filter(function(c){return team(c.sdr)===sdr&&inR(c.date,r);});
+    ccF=null;$("cc-t").textContent=sdr+"'s conversations";
+    drawCC();
+    $("cc").hidden=false;$("cc-x").focus();
+  });
+  var ccRows=[],ccF=null;
+  function drawCC(){
+    var cnt={};ccRows.forEach(function(c){var k=c.outcome||"Not logged";cnt[k]=(cnt[k]||0)+1;});
+    var ks=Object.keys(cnt).sort(function(a,b){return cnt[b]-cnt[a];});
+    $("cc-f").hidden=ks.length<2;
+    $("cc-f").innerHTML='<button class="dchip'+(ccF===null?" on":"")+'" data-d="">All<b>'+ccRows.length+'</b></button>'+ks.map(function(k){return '<button class="dchip'+(ccF===k?" on":"")+'" data-d="'+esc(k)+'">'+esc(k)+'<b>'+cnt[k]+'</b></button>';}).join("");
+    var rows=ccF===null?ccRows:ccRows.filter(function(c){return (c.outcome||"Not logged")===ccF;});
     var tot=rows.reduce(function(x,c){return x+(c.secs||0);},0);
-    $("cc-t").textContent=sdr+"'s conversations";
     $("cc-s").textContent=rows.length+" connected calls, "+hm(tot)+" of talk time";
     $("cc-b").innerHTML=rows.length?rows.map(function(c){
       return '<tr><td class="nw">'+nice(c.date)+' <span class="muted">'+esc(c.at||"")+'</span></td>'+
@@ -544,8 +611,8 @@
         '<td>'+(c.note?esc(c.note):'<span class="muted">No notes</span>')+'</td>'+
         '<td class="nw">'+(c.rec?'<button class="play" data-src="'+esc(c.rec)+'">Play</button>':'<span class="muted">No recording</span>')+'</td></tr>';
     }).join(""):'<tr><td colspan="6" class="empty">No connected calls in this range</td></tr>';
-    $("cc").hidden=false;$("cc-x").focus();
-  });
+  }
+  $("cc-f").addEventListener("click",function(e){var b=e.target.closest(".dchip");if(!b)return;ccF=b.dataset.d||null;drawCC();});
   $("cc-b").addEventListener("click",function(e){
     var b=e.target.closest(".play");if(!b)return;
     document.querySelectorAll("audio").forEach(function(a){a.pause();});
