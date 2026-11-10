@@ -26,6 +26,7 @@ check_login.py
 build_swimm.py
 meetings.py
 former_sdrs.json
+team.json
 diagnose_calls.py
 probe_dispositions.py
 probe_recordings.py

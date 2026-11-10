@@ -48,6 +48,10 @@ def main() -> int:
         payload["former_sdrs"] = json.loads((ROOT / "former_sdrs.json").read_text(encoding="utf-8"))
     except Exception:
         payload["former_sdrs"] = []
+    try:
+        payload["team"] = json.loads((ROOT / "team.json").read_text(encoding="utf-8"))
+    except Exception:
+        payload["team"] = []
     PAYLOAD_JSON.write_text(json.dumps(payload, ensure_ascii=False, indent=1), encoding="utf-8")
     write_payload_module(payload)
 
@@ -59,6 +63,8 @@ def main() -> int:
     print(f"call days {len({r['date'] for r in payload.get('calls_daily', [])})}")
     if c.get("unmapped_outcomes"):
         print(f"unmapped outcomes {c['unmapped_outcomes']}")
+    print("apollo names: " + ", ".join(sorted({r["sdr"] for r in payload.get("calls_daily", [])})))
+    print("emet names: " + ", ".join(sorted({m["sdr"] for m in (payload.get("meetings") or [])})))
     for e in payload.get("errors", []):
         print(f"error: {e}")
     return 0

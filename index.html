@@ -327,7 +327,8 @@
   function ago(t){var s=(Date.now()-new Date(t))/1000;if(s<3600)return Math.max(1,Math.round(s/60))+" min ago";if(s<86400)return Math.round(s/3600)+"h ago";return Math.round(s/86400)+" days ago";}
   var FORMER={};
   function key(n){return String(n||"").normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase().replace(/\s+/g," ").trim();}
-  function team(n){return FORMER[key(n)]?"Former SDRs":(n||"Unknown");}
+  var ALIAS={"fat g":"Fat Goska","alex":"Alexandro","adi h":"Adi Hasaković"};
+  function team(n){var k=key(n);if(FORMER[k])return "Former SDRs";return ALIAS[k]||n||"Unknown";}
   function outKey(m){if(m.status)return m.status;return (m.meeting&&m.meeting>=nowStr())?"_up":"_aw";}
 
   function range(){
@@ -445,6 +446,7 @@
       s.booked++;var k=outKey(m);
       if(k==="SQL")s.sql++;else if(k==="Reschedule")s.res++;else if(k==="No Show")s.ns++;else if(k==="Not Relevant")s.nr++;else s.open++;
     });
+    (D.team||[]).forEach(function(n){var t=team(n);if(!by[t])by[t]={sdr:t,booked:0,sql:0,res:0,ns:0,nr:0,open:0};});
     var ml=sortRows(Object.keys(by).map(function(k){var s=by[k];s.rate=pct(s.sql,s.booked);return s;}),sM);
     $("tm").querySelector("tbody").innerHTML=ml.length?ml.map(function(s,i){
       var fm=s.sdr==="Former SDRs";
@@ -455,6 +457,7 @@
 
     var cb={};
     cs.forEach(function(x){var n=team(x.sdr),s=cb[n]||(cb[n]={sdr:n,calls:0,connected:0,secs:0,days:0});s.calls+=x.count;s.connected+=(x.connected||0);s.secs+=(x.secs||0);s.days++;});
+    (D.team||[]).forEach(function(n){var t=team(n);if(!cb[t])cb[t]={sdr:t,calls:0,connected:0,secs:0,days:0};});
     var cl=sortRows(Object.keys(cb).map(function(k){var s=cb[k];s.perday=s.days?Math.round(s.calls/s.days):0;s.cr=pct(s.connected,s.calls);return s;}),sC);
     var maxC=cl.reduce(function(a,s){return Math.max(a,s.calls);},1);
     $("tc").querySelector("tbody").innerHTML=cl.length?cl.map(function(s,i){
