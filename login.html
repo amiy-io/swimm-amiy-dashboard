@@ -4,144 +4,63 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <meta name="robots" content="noindex, nofollow" />
-<title>Sign in · Swimm Activity Dashboard</title>
+<title>Sign in · Swimm Outbound Report · Amiy</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet">
 <style>
-  :root{
-    --bg:#fbf9f7; --surface:#ffffff; --surface-2:#faf6f2;
-    --border:#eee7e0; --border-2:#e0d5ca;
-    --text-0:#171412; --text-1:#4a423c; --text-2:#7d726a; --text-3:#a89c93;
-    --orange:#f2681f; --orange-2:#ff9345; --orange-deep:#d64f0c; --orange-soft:#fff1e6;
-    --red:#c0392b;
-    --shadow:0 1px 3px rgba(28,25,23,.05),0 10px 30px rgba(28,25,23,.07);
-    --shadow-lg:0 2px 6px rgba(242,104,31,.08),0 16px 44px rgba(28,25,23,.10);
-    --radius:18px;
-  }
-  *{box-sizing:border-box} html,body{margin:0;padding:0;height:100%}
-  body{
-    background:
-      radial-gradient(1100px 460px at 78% -12%, #ffe6d3 0%, rgba(255,230,211,0) 62%),
-      radial-gradient(760px 380px at 4% -8%, #ffeede 0%, rgba(255,238,222,0) 58%),
-      var(--bg);
-    background-attachment:fixed;
-    color:var(--text-0);line-height:1.45;
-    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Inter,Roboto,Helvetica,Arial,sans-serif;
-    -webkit-font-smoothing:antialiased;
-    display:flex;align-items:center;justify-content:center;padding:24px}
-
-  .card{width:100%;max-width:400px;background:var(--surface);border:1px solid var(--border);
-    border-radius:var(--radius);box-shadow:var(--shadow-lg);padding:34px 32px 28px}
-
-  .brand{display:flex;align-items:center;gap:14px;margin-bottom:26px}
-  .brand .mark{width:50px;height:50px;border-radius:15px;display:flex;align-items:center;justify-content:center;
-    background:linear-gradient(140deg,var(--orange-2) 0%,var(--orange) 55%,var(--orange-deep) 100%);
-    color:#fff;font-weight:800;font-size:23px;letter-spacing:-.02em;
-    box-shadow:0 6px 20px rgba(242,104,31,.34),inset 0 1px 0 rgba(255,255,255,.35)}
-  .brand h1{margin:0;font-size:17px;font-weight:750;letter-spacing:-.02em}
-  .brand h1 span{color:var(--orange)}
-  .brand .sub{font-size:12.5px;color:var(--text-2);margin-top:2px}
-
-  label{display:block;font-size:12px;font-weight:650;letter-spacing:.04em;
-    text-transform:uppercase;color:var(--text-2);margin:0 0 7px}
-  input{width:100%;padding:12px 14px;font-size:15px;font-family:inherit;color:var(--text-0);
-    background:var(--surface-2);border:1px solid var(--border-2);border-radius:11px;
-    outline:none;transition:border-color .15s,box-shadow .15s,background .15s}
-  input:focus{border-color:var(--orange);background:#fff;
-    box-shadow:0 0 0 3px rgba(242,104,31,.13)}
-  .field{margin-bottom:16px}
-
-  button{width:100%;margin-top:6px;padding:13px 16px;font-size:15px;font-weight:700;
-    font-family:inherit;color:#fff;border:0;border-radius:12px;cursor:pointer;
-    background:linear-gradient(140deg,var(--orange-2) 0%,var(--orange) 58%,var(--orange-deep) 100%);
-    box-shadow:0 6px 18px rgba(242,104,31,.30);transition:transform .12s,box-shadow .15s,filter .15s}
-  button:hover:not(:disabled){filter:brightness(1.04);box-shadow:0 8px 22px rgba(242,104,31,.36)}
-  button:active:not(:disabled){transform:translateY(1px)}
-  button:disabled{opacity:.62;cursor:default;box-shadow:none}
-
-  .msg{margin-top:16px;font-size:13.5px;padding:11px 13px;border-radius:11px;display:none}
-  .msg.err{display:block;background:#fdeceb;border:1px solid #f4c9c4;color:var(--red)}
-  .msg.info{display:block;background:var(--orange-soft);border:1px solid #ffd9bd;color:var(--orange-deep)}
-
-  .foot{margin-top:22px;padding-top:16px;border-top:1px solid var(--border);
-    font-size:12px;color:var(--text-3);text-align:center}
-  .foot a{color:var(--text-2);text-decoration:none}
+  :root{--ink:#121821;--muted:#6b7480;--faint:#9aa2ad;--line:#e6eaf0;--line-2:#d7dde6;--blue:#034a92;--yellow:#f6ca13;--red:#c2410c}
+  *{box-sizing:border-box}
+  html,body{margin:0;height:100%}
+  body{font-family:Manrope,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;-webkit-font-smoothing:antialiased;
+    color:var(--ink);background:#f5f7fa;display:flex;align-items:center;justify-content:center;padding:24px}
+  .card{width:100%;max-width:390px;background:#fff;border:1px solid var(--line);border-radius:18px;padding:32px 30px 26px;
+    box-shadow:0 1px 2px rgba(18,24,33,.04),0 16px 44px rgba(18,24,33,.08)}
+  .brand{display:flex;align-items:center;gap:12px;margin-bottom:26px}
+  .brand img{height:42px;width:42px;border-radius:12px}
+  .brand .t{font-size:18px;font-weight:800;letter-spacing:-.02em}
+  .brand .s{font-size:12.5px;color:var(--muted);font-weight:600}
+  label{display:block;font-size:12.5px;font-weight:700;color:var(--muted);margin:0 0 6px}
+  input{width:100%;padding:12px 14px;font:inherit;font-size:15px;color:var(--ink);background:#fff;border:1px solid var(--line-2);border-radius:11px;outline:none}
+  input:focus{border-color:var(--blue);box-shadow:0 0 0 3px rgba(3,74,146,.12)}
+  .f{margin-bottom:14px}
+  button{width:100%;margin-top:8px;padding:13px;font:inherit;font-size:15px;font-weight:800;color:#fff;background:var(--blue);border:0;border-radius:11px;cursor:pointer}
+  button:hover:not(:disabled){background:#0b5cb0}
+  button:disabled{opacity:.6;cursor:default}
+  .msg{display:none;margin-top:14px;font-size:13px;font-weight:600;padding:10px 12px;border-radius:10px}
+  .msg.err{display:block;background:#fdeee6;color:var(--red)}
+  .msg.info{display:block;background:#fdf5d3;color:#6b5600}
+  .foot{margin-top:20px;padding-top:14px;border-top:1px solid var(--line);font-size:12px;color:var(--faint);text-align:center;font-weight:600}
 </style>
 </head>
 <body>
-
 <form class="card" id="form" autocomplete="on">
   <div class="brand">
-    <div class="mark">S</div>
-    <div>
-      <h1>Swimm <span>·</span> Activity Dashboard</h1>
-      <div class="sub">Outbound performance · powered by Amiy</div>
-    </div>
+    <img src="https://media.base44.com/images/public/69e3ce3cfef2251bd195213a/e0b0e910d_AMIYlogo.png" alt="Amiy">
+    <div><div class="t">Swimm outbound report</div><div class="s">Run by Amiy</div></div>
   </div>
-
-  <div class="field">
-    <label for="email">E-mail</label>
-    <input type="email" id="email" name="email" autocomplete="username"
-           required autofocus spellcheck="false" />
-  </div>
-
-  <div class="field">
-    <label for="password">Password</label>
-    <input type="password" id="password" name="password"
-           autocomplete="current-password" required />
-  </div>
-
+  <div class="f"><label for="email">Email</label><input type="email" id="email" autocomplete="username" required autofocus spellcheck="false"></div>
+  <div class="f"><label for="password">Password</label><input type="password" id="password" autocomplete="current-password" required></div>
   <button type="submit" id="go">Sign in</button>
   <div class="msg" id="msg"></div>
-
-  <div class="foot">Private dashboard · access by invitation only</div>
+  <div class="foot">Private report · access by invitation</div>
 </form>
-
 <script>
 (function(){
-  var form = document.getElementById("form"),
-      btn  = document.getElementById("go"),
-      msg  = document.getElementById("msg");
-
-  function say(text, kind){
-    msg.textContent = text;
-    msg.className = "msg " + (kind || "err");
-  }
-
-  // Already signed in? Go straight through.
-  fetch("/api/login", {credentials:"same-origin"})
-    .then(function(r){ return r.json(); })
-    .then(function(j){ if(j && j.auth) location.replace("/"); })
-    .catch(function(){});
-
-  form.addEventListener("submit", function(e){
-    e.preventDefault();
-    btn.disabled = true; btn.textContent = "Signing in…";
-    msg.className = "msg";
-
-    fetch("/api/login", {
-      method: "POST",
-      credentials: "same-origin",
-      headers: {"Content-Type": "application/json"},
-      body: JSON.stringify({
-        email: document.getElementById("email").value,
-        password: document.getElementById("password").value
-      })
-    })
-    .then(function(r){ return r.json().then(function(j){ return {ok:r.ok, j:j}; }); })
+  var form=document.getElementById("form"),btn=document.getElementById("go"),msg=document.getElementById("msg");
+  function say(t,k){msg.textContent=t;msg.className="msg "+(k||"err");}
+  fetch("/api/login",{credentials:"same-origin"}).then(function(r){return r.json();}).then(function(j){if(j&&j.auth)location.replace("/");}).catch(function(){});
+  form.addEventListener("submit",function(e){
+    e.preventDefault();btn.disabled=true;btn.textContent="Signing in";msg.className="msg";
+    fetch("/api/login",{method:"POST",credentials:"same-origin",headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({email:document.getElementById("email").value,password:document.getElementById("password").value})})
+    .then(function(r){return r.json().then(function(j){return {ok:r.ok,j:j};});})
     .then(function(res){
-      if(res.ok && res.j.auth){
-        say("Signed in. Loading the dashboard…", "info");
-        location.replace("/");
-        return;
-      }
-      say((res.j && res.j.error) || "Sign-in failed.");
-      btn.disabled = false; btn.textContent = "Sign in";
-      document.getElementById("password").value = "";
-      document.getElementById("password").focus();
+      if(res.ok&&res.j.auth){say("Signed in","info");location.replace("/");return;}
+      say((res.j&&res.j.error)||"Sign in failed.");btn.disabled=false;btn.textContent="Sign in";
+      document.getElementById("password").value="";document.getElementById("password").focus();
     })
-    .catch(function(){
-      say("Couldn't reach the server. Check your connection and try again.");
-      btn.disabled = false; btn.textContent = "Sign in";
-    });
+    .catch(function(){say("Couldn't reach the server. Try again.");btn.disabled=false;btn.textContent="Sign in";});
   });
 })();
 </script>

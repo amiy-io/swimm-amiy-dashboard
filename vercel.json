@@ -7,12 +7,6 @@
     "api/warm.py": { "maxDuration": 800 },
     "api/feed.py": { "maxDuration": 800 }
   },
-  "crons": [
-    {
-      "path": "/api/warm",
-      "schedule": "0 21 * * *"
-    }
-  ],
   "rewrites": [
     { "source": "/login", "destination": "/login.html" }
   ],

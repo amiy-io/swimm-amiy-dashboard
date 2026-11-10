@@ -8,6 +8,7 @@ ROOT = Path(__file__).resolve().parent
 sys.path.insert(0, str(ROOT / "api"))
 
 import _core
+from meetings import fetch_meetings
 
 PAYLOAD_JSON = ROOT / "swimm-payload.json"
 PAYLOAD_PY = ROOT / "api" / "_payload.py"
@@ -42,6 +43,7 @@ def main() -> int:
     args = ap.parse_args()
 
     payload = _core.build_payload(days=args.days, time_budget_s=args.budget)
+    payload["meetings"] = fetch_meetings(payload.setdefault("errors", []))
     PAYLOAD_JSON.write_text(json.dumps(payload, ensure_ascii=False, indent=1), encoding="utf-8")
     write_payload_module(payload)
 
@@ -49,6 +51,7 @@ def main() -> int:
     print(f"generated_at {payload.get('generated_at')}")
     print(f"window {payload.get('date_min')} -> {payload.get('date_max')}")
     print(f"calls {c.get('calls')}  emails {c.get('emails')}  sdrs {c.get('sdrs')}  named {c.get('named')}")
+    print(f"meetings {len(payload['meetings']) if payload.get('meetings') is not None else 'unavailable'}")
     print(f"call days {len({r['date'] for r in payload.get('calls_daily', [])})}")
     if c.get("unmapped_outcomes"):
         print(f"unmapped outcomes {c['unmapped_outcomes']}")

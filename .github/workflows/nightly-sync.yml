@@ -24,6 +24,7 @@ jobs:
       - name: Build the payload from Apollo
         env:
           APOLLO_SWIMM_KEY: ${{ secrets.APOLLO_SWIMM_KEY }}
+          SWIMM_EMET_KEY: ${{ secrets.SWIMM_EMET_KEY }}
           SWIMM_429_ATTEMPTS: "9"
           SWIMM_429_MAX_SLEEP: "300"
         run: python3 build_swimm.py --days 30

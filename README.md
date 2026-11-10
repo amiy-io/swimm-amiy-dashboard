@@ -12,11 +12,14 @@ Every night at 01:00 UTC, the GitHub Action in `.github/workflows/nightly-sync.y
 
 Pushing to `main` does not deploy on its own. Only the nightly job deploys.
 
+Meetings come from EMET (Account Management Hub) through its `swimmDashboardMeetings` function, which needs the `SWIMM_EMET_KEY` secret here to match `SWIMM_DASHBOARD_KEY` in EMET's secrets.
+
 ## Secrets (GitHub → Settings → Secrets and variables → Actions)
 
 | Name | What it is |
 |---|---|
 | `APOLLO_SWIMM_KEY` | API key from the Swimm Apollo sub-account |
+| `SWIMM_EMET_KEY` | Key for the EMET meetings feed (same value as `SWIMM_DASHBOARD_KEY` in EMET) |
 | `VERCEL_TOKEN` | Token created in Vercel while logged in as the amiy-dev owner account |
 
 ## Run it now
