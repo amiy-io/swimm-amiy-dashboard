@@ -325,6 +325,9 @@
   function nice(ds){if(!ds)return "";var p=ds.slice(0,10).split("-");return parseInt(p[2],10)+" "+MO[parseInt(p[1],10)-1];}
   function niceT(ds){return ds&&ds.length>10?nice(ds)+", "+ds.slice(11,16):nice(ds);}
   function ago(t){var s=(Date.now()-new Date(t))/1000;if(s<3600)return Math.max(1,Math.round(s/60))+" min ago";if(s<86400)return Math.round(s/3600)+"h ago";return Math.round(s/86400)+" days ago";}
+  var FORMER={};
+  function key(n){return String(n||"").normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase().replace(/\s+/g," ").trim();}
+  function team(n){return FORMER[key(n)]?"Former SDRs":(n||"Unknown");}
   function outKey(m){if(m.status)return m.status;return (m.meeting&&m.meeting>=nowStr())?"_up":"_aw";}
 
   function range(){
@@ -344,6 +347,7 @@
   }
   function sortRows(rows,s){
     return rows.sort(function(a,b){
+      if(a.sdr==="Former SDRs")return 1;if(b.sdr==="Former SDRs")return -1;
       if(s.k==="sdr")return s.d==="asc"?a.sdr.localeCompare(b.sdr):b.sdr.localeCompare(a.sdr);
       return s.d==="asc"?a[s.k]-b[s.k]:b[s.k]-a[s.k];
     });
@@ -437,26 +441,28 @@
 
     var by={};
     M.forEach(function(m){
-      var n=m.sdr||"Unknown",s=by[n]||(by[n]={sdr:n,booked:0,sql:0,res:0,ns:0,nr:0,open:0});
+      var n=team(m.sdr),s=by[n]||(by[n]={sdr:n,booked:0,sql:0,res:0,ns:0,nr:0,open:0});
       s.booked++;var k=outKey(m);
       if(k==="SQL")s.sql++;else if(k==="Reschedule")s.res++;else if(k==="No Show")s.ns++;else if(k==="Not Relevant")s.nr++;else s.open++;
     });
     var ml=sortRows(Object.keys(by).map(function(k){var s=by[k];s.rate=pct(s.sql,s.booked);return s;}),sM);
     $("tm").querySelector("tbody").innerHTML=ml.length?ml.map(function(s,i){
-      return '<tr><td class="who"><span class="rank">'+(i+1)+'</span>'+esc(s.sdr)+'</td><td class="num">'+s.booked+'</td><td class="num">'+s.sql+'</td>'+
+      var fm=s.sdr==="Former SDRs";
+      return '<tr'+(fm?' style="opacity:.6"':'')+'><td class="who"><span class="rank">'+(fm?"":i+1)+'</span>'+esc(s.sdr)+'</td><td class="num">'+s.booked+'</td><td class="num">'+s.sql+'</td>'+
         '<td><div class="meter y"><div class="tr"><span style="width:'+s.rate+'%"></span></div><span class="pc'+(s.rate?"":" zero")+'">'+s.rate+'%</span></div></td>'+
         '<td class="num">'+s.res+'</td><td class="num">'+s.ns+'</td><td class="num">'+s.nr+'</td><td class="num">'+s.open+'</td></tr>';
     }).join(""):'<tr><td colspan="8" class="empty">No meetings booked in this range</td></tr>';
 
     var cb={};
-    cs.forEach(function(x){var s=cb[x.sdr]||(cb[x.sdr]={sdr:x.sdr,calls:0,connected:0,secs:0,days:0});s.calls+=x.count;s.connected+=(x.connected||0);s.secs+=(x.secs||0);s.days++;});
+    cs.forEach(function(x){var n=team(x.sdr),s=cb[n]||(cb[n]={sdr:n,calls:0,connected:0,secs:0,days:0});s.calls+=x.count;s.connected+=(x.connected||0);s.secs+=(x.secs||0);s.days++;});
     var cl=sortRows(Object.keys(cb).map(function(k){var s=cb[k];s.perday=s.days?Math.round(s.calls/s.days):0;s.cr=pct(s.connected,s.calls);return s;}),sC);
     var maxC=cl.reduce(function(a,s){return Math.max(a,s.calls);},1);
     $("tc").querySelector("tbody").innerHTML=cl.length?cl.map(function(s,i){
-      var mail=(D.sdr_emails&&D.sdr_emails[s.sdr])?'<span class="sub">'+esc(D.sdr_emails[s.sdr])+'</span>':"";
-      return '<tr><td class="who"><span class="rank">'+(i+1)+'</span>'+esc(s.sdr)+mail+'</td>'+
+      var fm=s.sdr==="Former SDRs";
+      var mail=(!fm&&D.sdr_emails&&D.sdr_emails[s.sdr])?'<span class="sub">'+esc(D.sdr_emails[s.sdr])+'</span>':"";
+      return '<tr'+(fm?' style="opacity:.6"':'')+'><td class="who"><span class="rank">'+(fm?"":i+1)+'</span>'+esc(s.sdr)+mail+'</td>'+
         '<td><div class="meter"><div class="tr"><span style="width:'+Math.max(3,s.calls/maxC*100)+'%"></span></div><span class="pc">'+fmt(s.calls)+'</span></div></td>'+
-        '<td class="num">'+(s.connected?'<a href="#" class="conn" data-sdr="'+esc(s.sdr)+'">'+fmt(s.connected)+'</a>':"0")+'</td>'+
+        '<td class="num">'+(s.connected&&!fm?'<a href="#" class="conn" data-sdr="'+esc(s.sdr)+'">'+fmt(s.connected)+'</a>':fmt(s.connected))+'</td>'+
         '<td class="num">'+s.cr+'%</td><td class="num">'+s.perday+'</td><td class="num">'+hm(s.secs)+'</td></tr>';
     }).join(""):'<tr><td colspan="6" class="empty">No calls in this range</td></tr>';
 
@@ -490,7 +496,7 @@
       .then(function(r){if(r.status===401){toLogin();throw new Error("Not signed in");}if(!r.ok)throw new Error("the server answered "+r.status);return r.json();})
       .then(function(j){
         if(!j||!j.calls_daily)throw new Error((j&&j.error)||"this build has no data");
-        D=j;$("state").hidden=true;$("dash").hidden=false;
+        D=j;FORMER={};(D.former_sdrs||[]).forEach(function(n){FORMER[key(n)]=1;});$("state").hidden=true;$("dash").hidden=false;
         $("d-from").value=D.date_min;$("d-to").value=D.date_max;
         render();
       })

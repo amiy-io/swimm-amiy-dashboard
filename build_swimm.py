@@ -44,6 +44,10 @@ def main() -> int:
 
     payload = _core.build_payload(days=args.days, time_budget_s=args.budget)
     payload["meetings"] = fetch_meetings(payload.setdefault("errors", []))
+    try:
+        payload["former_sdrs"] = json.loads((ROOT / "former_sdrs.json").read_text(encoding="utf-8"))
+    except Exception:
+        payload["former_sdrs"] = []
     PAYLOAD_JSON.write_text(json.dumps(payload, ensure_ascii=False, indent=1), encoding="utf-8")
     write_payload_module(payload)
 
