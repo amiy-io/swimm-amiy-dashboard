@@ -1,0 +1,13 @@
+swimm-payload.json
+api/_payload.py
+swimm_key.txt
+api/swimm_key.txt
+.env
+.env.*
+.vercel/
+__pycache__/
+*.pyc
+.DS_Store
+swimm-logins.txt
+swimm-vercel-env.txt
+swimm-users-current.txt

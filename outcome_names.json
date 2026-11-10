@@ -1,0 +1,25 @@
+{
+  "_comment": "Apollo call-disposition id -> label. Matched by match_outcomes.py using contacts read off the Apollo UI, then verified against the call count Apollo reports for each disposition (every one came out at ratio 1.0x).",
+  "_note_no_answer": "6a6a6731a4b32f0018d6c45b is No Answer by sequence: ids c45c..c463 were each confirmed as list positions 2-9 (Left Voicemail, Busy, Gatekeeper, Bad / Wrong Number, Not in Service, Connected - Positive/Neutral/Negative), so c45b is position 1.",
+
+  "6a6a6731a4b32f0018d6c45b": "No Answer",
+  "6a6a6731a4b32f0018d6c45c": "Left Voicemail",
+  "6a6a6731a4b32f0018d6c45d": "Busy",
+  "6a6a6731a4b32f0018d6c45e": "Gatekeeper",
+  "6a6a6731a4b32f0018d6c45f": "Bad / Wrong Number",
+  "6a6a6731a4b32f0018d6c460": "Not in Service",
+  "6a6a6731a4b32f0018d6c461": "Connected - Positive",
+  "6a6a6731a4b32f0018d6c462": "Connected - Neutral",
+  "6a6a6731a4b32f0018d6c463": "Connected - Negative",
+
+  "6a6a6842b232610020a7dd3d": "Rejected Before The Pitch",
+  "6a6a6847ba36e200141241fd": "Rejected After The Pitch",
+  "6a6a684c9cf49900144e0934": "Auto VM",
+  "6a6a685215f4290018a1192b": "Do Not Contact",
+  "6a6a68590842f7001c6f3aa0": "Not the right person",
+  "6a6a685f05eeaf00146a241f": "Not the right company",
+  "6a6a6865b519620014e3d996": "Does not work at the company",
+  "6a6a686c6af2450010c6110d": "Out Of The Office",
+  "6a6a6873cdf6c70010b05a6e": "Bad/wrong number",
+  "6a6a687a60cde80014504e3a": "Meeting Scheduled"
+}

@@ -1,0 +1,792 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Swimm · Activity Dashboard</title>
+<style>
+  :root{
+    --bg:#fbf9f7;
+    --bg-tint:#fff4ec;
+    --surface:#ffffff;
+    --surface-2:#faf6f2;
+    --border:#eee7e0;
+    --border-2:#e0d5ca;
+    --text-0:#171412;
+    --text-1:#4a423c;
+    --text-2:#7d726a;
+    --text-3:#a89c93;
+    --orange:#f2681f;
+    --orange-2:#ff9345;
+    --orange-deep:#d64f0c;
+    --orange-soft:#fff1e6;
+    --ink:#1c1917;
+    --green:#0f9d58;
+    --shadow-sm:0 1px 2px rgba(28,25,23,.05);
+    --shadow:0 1px 3px rgba(28,25,23,.05),0 10px 30px rgba(28,25,23,.07);
+    --shadow-lg:0 2px 6px rgba(242,104,31,.08),0 16px 44px rgba(28,25,23,.10);
+    --radius:18px;
+  }
+  *{box-sizing:border-box} html,body{margin:0;padding:0}
+  body{
+    background:
+      radial-gradient(1100px 460px at 78% -12%, #ffe6d3 0%, rgba(255,230,211,0) 62%),
+      radial-gradient(760px 380px at 4% -8%, #ffeede 0%, rgba(255,238,222,0) 58%),
+      var(--bg);
+    background-attachment:fixed;
+    color:var(--text-0);line-height:1.45;
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Inter,Roboto,Helvetica,Arial,sans-serif;
+    -webkit-font-smoothing:antialiased}
+  .wrap{max-width:1240px;margin:0 auto;padding:38px 24px 72px}
+
+  /* ── header ── */
+  .top{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-bottom:26px}
+  .topright{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+  .signout{display:inline-flex;align-items:center;gap:8px;padding:7px 13px;border-radius:10px;cursor:pointer;
+    font:inherit;font-size:12.5px;font-weight:650;color:var(--text-1);
+    background:var(--surface);border:1px solid var(--border-2);box-shadow:var(--shadow-sm);
+    transition:border-color .15s,color .15s}
+  .signout[hidden]{display:none}
+  .signout:hover{border-color:var(--orange);color:var(--orange-deep)}
+  .signout #whoami{color:var(--text-3);font-weight:550;max-width:190px;overflow:hidden;
+    text-overflow:ellipsis;white-space:nowrap}
+  .signout #whoami:not(:empty)::after{content:"·";margin-left:8px;color:var(--border-2)}
+  .brand{display:flex;align-items:center;gap:15px}
+  .brand .mark{width:52px;height:52px;border-radius:15px;display:flex;align-items:center;justify-content:center;
+    background:linear-gradient(140deg,var(--orange-2) 0%,var(--orange) 55%,var(--orange-deep) 100%);
+    color:#fff;font-weight:800;font-size:24px;letter-spacing:-.02em;
+    box-shadow:0 6px 20px rgba(242,104,31,.34),inset 0 1px 0 rgba(255,255,255,.35)}
+  .brand h1{font-size:25px;margin:0;font-weight:780;letter-spacing:-.025em;color:var(--ink)}
+  .brand h1 span{color:var(--orange)}
+  .brand .sub{font-size:13px;color:var(--text-2);margin-top:3px;letter-spacing:.01em}
+  .live{display:inline-flex;align-items:center;gap:9px;background:var(--surface);border:1px solid var(--border);
+    border-radius:999px;padding:9px 17px;font-size:13px;font-weight:600;color:var(--text-1);box-shadow:var(--shadow-sm)}
+  .live .dot{width:9px;height:9px;border-radius:50%;background:var(--green);
+    box-shadow:0 0 0 4px rgba(15,157,88,.13);animation:pulse 2.2s infinite}
+  @keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+
+  /* ── controls ── */
+  .controls{display:flex;gap:11px;align-items:center;margin-bottom:24px;flex-wrap:wrap}
+  .seg{display:inline-flex;background:var(--surface);border:1px solid var(--border);border-radius:13px;padding:4px;
+    box-shadow:var(--shadow-sm)}
+  .seg button{border:0;background:transparent;color:var(--text-2);font:inherit;font-size:14px;font-weight:650;
+    padding:9px 18px;border-radius:10px;cursor:pointer;transition:.16s}
+  .seg button:hover{color:var(--ink);background:var(--surface-2)}
+  .seg button.active{background:linear-gradient(135deg,var(--orange-2),var(--orange));color:#fff;
+    box-shadow:0 3px 10px rgba(242,104,31,.32)}
+  .custom{display:none;align-items:center;gap:8px;background:var(--surface);border:1px solid var(--border);
+    border-radius:13px;padding:6px 13px;box-shadow:var(--shadow-sm);font-size:14px;color:var(--text-2)}
+  .custom.on{display:inline-flex}
+  .custom input{border:1px solid var(--border);border-radius:9px;padding:6px 10px;font:inherit;font-size:14px;
+    color:var(--ink);background:var(--surface-2)}
+  .custom input:focus{outline:2px solid rgba(242,104,31,.35);outline-offset:1px;border-color:var(--orange)}
+  .reload{margin-left:auto;border:1px solid var(--border);background:var(--surface);color:var(--text-1);
+    font:inherit;font-size:14px;font-weight:650;padding:10px 19px;border-radius:13px;cursor:pointer;
+    box-shadow:var(--shadow-sm);transition:.16s}
+  .reload:hover{border-color:var(--orange);color:var(--orange);background:var(--orange-soft)}
+  .range-label{font-size:13px;color:var(--text-3);width:100%;margin-top:-2px}
+
+  /* ── KPI cards ── */
+  .kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:18px;margin-bottom:28px}
+  @media(max-width:900px){.kpis{grid-template-columns:repeat(2,1fr)}}
+  @media(max-width:480px){.kpis{grid-template-columns:1fr}}
+  .kpi{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:26px 24px 24px;
+    box-shadow:var(--shadow);position:relative;overflow:hidden;transition:transform .18s,box-shadow .18s}
+  .kpi:hover{transform:translateY(-3px);box-shadow:var(--shadow-lg)}
+  .kpi::before{content:"";position:absolute;left:0;right:0;top:0;height:4px;
+    background:linear-gradient(90deg,var(--orange-2),var(--orange))}
+  .kpi::after{content:"";position:absolute;right:-38px;top:-38px;width:120px;height:120px;border-radius:50%;
+    background:radial-gradient(circle,rgba(242,104,31,.10),rgba(242,104,31,0) 70%)}
+  .kpi:nth-child(2)::before{background:linear-gradient(90deg,#ffb066,var(--orange-2))}
+  .kpi:nth-child(3)::before{background:linear-gradient(90deg,#ffd28f,#ffa257)}
+  .kpi:nth-child(4)::before{background:linear-gradient(90deg,var(--orange),var(--orange-deep))}
+  .kpi:nth-child(5)::before{background:linear-gradient(90deg,#ffc98f,#ff9345)}
+  .kpi .label{font-size:11.5px;color:var(--text-2);font-weight:750;text-transform:uppercase;letter-spacing:.07em}
+  .kpi .value{font-size:42px;font-weight:800;letter-spacing:-.035em;margin-top:10px;line-height:1;color:var(--ink)}
+  .kpi .meta{font-size:12.5px;color:var(--text-3);margin-top:8px}
+
+  /* ── panels ── */
+  .panel{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);
+    box-shadow:var(--shadow);margin-bottom:20px;overflow:hidden}
+  .panel h2{font-size:16.5px;margin:0;padding:20px 26px;border-bottom:1px solid var(--border);font-weight:740;
+    display:flex;align-items:center;gap:11px;letter-spacing:-.015em;color:var(--ink);
+    background:linear-gradient(180deg,#fffaf6,var(--surface))}
+  .panel h2::before{content:"";width:4px;height:19px;border-radius:3px;
+    background:linear-gradient(180deg,var(--orange-2),var(--orange))}
+  .panel h2 .tag{font-size:12.5px;font-weight:650;color:var(--text-3);margin-left:auto;letter-spacing:0}
+  .scroll{overflow-x:auto}
+  table{width:100%;border-collapse:collapse;min-width:760px}
+  th,td{text-align:left;padding:15px 26px;font-size:14.5px;white-space:nowrap}
+  th{color:var(--text-2);font-weight:750;font-size:11px;text-transform:uppercase;letter-spacing:.07em;
+    background:var(--surface-2);cursor:pointer;user-select:none;transition:.14s;border-bottom:1px solid var(--border)}
+  th.no-sort{cursor:default}
+  th:hover:not(.no-sort){color:var(--orange)}
+  td{border-top:1px solid var(--border);color:var(--text-1)}
+  td.num,th.num{text-align:right;font-variant-numeric:tabular-nums}
+  td.num{font-weight:720;color:var(--ink);font-size:15.5px}
+  td.sdr{font-weight:720;color:var(--ink);font-size:15px}
+  td .mail{display:block;font-size:12px;color:var(--text-3);font-weight:400;margin-top:2px}
+  tbody tr{transition:background .14s}
+  tbody tr:hover td{background:var(--orange-soft)}
+  tbody tr:first-child td.num:nth-child(3){color:var(--orange-deep)}
+  .bar{height:11px;border-radius:7px;background:#f2ece6;overflow:hidden;min-width:120px}
+  .bar span{display:block;height:100%;border-radius:7px;
+    background:linear-gradient(90deg,var(--orange-2),var(--orange));box-shadow:0 1px 3px rgba(242,104,31,.28)}
+  .bar.mail-bar span{background:linear-gradient(90deg,#ffc07a,#ff8a3d)}
+  .share{color:var(--text-2);font-weight:650}
+  .rate{font-weight:760}
+  .rate.hi{color:var(--green)}
+  .rate.mid{color:#c77700}
+  .rate.lo{color:#b4380f}
+  .empty{padding:48px 26px;text-align:center;color:var(--text-3);font-size:14px}
+  .foot{margin-top:32px;text-align:center;color:var(--text-3);font-size:12.5px}
+  .foot a{color:var(--orange);text-decoration:none;font-weight:650}
+  .foot a:hover{text-decoration:underline}
+  #state{padding:76px 20px;text-align:center;color:var(--text-2)}
+  .spin{width:30px;height:30px;border:3px solid #f0e6dc;border-top-color:var(--orange);border-radius:50%;
+    margin:0 auto 16px;animation:rot .8s linear infinite}
+  @keyframes rot{to{transform:rotate(360deg)}}
+  .err-box{background:#fff4f1;border:1px solid #f7c9ba;border-radius:var(--radius);
+    padding:24px;color:#b4380f;max-width:620px;margin:0 auto;text-align:left;font-size:14px}
+  .err-box code{background:#ffe6db;padding:2px 6px;border-radius:5px;font-size:13px}
+
+  /* clickable connected count */
+  .conn-link{color:var(--orange);font-weight:760;text-decoration:none;border-bottom:1.5px dotted var(--orange-2)}
+  .conn-link:hover{color:var(--orange-deep);border-bottom-style:solid}
+
+  /* drill-down modal */
+  .modal-back{position:fixed;inset:0;background:rgba(23,20,18,.42);backdrop-filter:blur(3px);
+    display:flex;align-items:center;justify-content:center;padding:28px;z-index:60}
+  .modal-back[hidden]{display:none}
+  .modal{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);
+    box-shadow:0 24px 70px rgba(28,25,23,.30);width:min(1080px,100%);max-height:86vh;
+    display:flex;flex-direction:column;overflow:hidden}
+  .modal-head{display:flex;align-items:flex-start;gap:12px;padding:20px 26px;
+    border-bottom:1px solid var(--border);background:linear-gradient(180deg,#fffaf6,var(--surface))}
+  .modal-title{font-size:17px;font-weight:760;letter-spacing:-.015em;color:var(--ink)}
+  .modal-sub{font-size:12.5px;color:var(--text-2);margin-top:3px}
+  .modal-x{margin-left:auto;border:1px solid var(--border);background:var(--surface);
+    color:var(--text-2);font-size:20px;line-height:1;width:34px;height:34px;border-radius:10px;
+    cursor:pointer;transition:.15s}
+  .modal-x:hover{border-color:var(--orange);color:var(--orange);background:var(--orange-soft)}
+  .modal-body{overflow:auto}
+  .modal-body td{white-space:normal}
+  .modal-body td.nowrap{white-space:nowrap}
+  .note-cell{max-width:340px;color:var(--text-2);font-size:13.5px}
+  .play{display:inline-flex;align-items:center;gap:6px;color:var(--orange);font-weight:700;
+    text-decoration:none;font-size:13.5px}
+  .play:hover{text-decoration:underline}
+  .play-btn{border:1px solid #f8d6bd;background:var(--orange-soft);border-radius:9px;
+    padding:6px 13px;cursor:pointer;font-family:inherit;white-space:nowrap;transition:.14s}
+  .play-btn:hover{background:var(--orange);color:#fff;border-color:transparent}
+  audio.rec{height:34px;width:230px;vertical-align:middle}
+  @media(max-width:700px){ audio.rec{width:180px} }
+  .muted{color:var(--text-3)}
+  /* pipeline */
+  .pipe-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:14px;padding:20px 26px}
+  .pipe{border:1px solid var(--border);border-radius:13px;padding:16px 18px;background:var(--surface-2);
+    transition:transform .15s,box-shadow .15s}
+  .pipe:hover{transform:translateY(-2px);box-shadow:var(--shadow)}
+  .pipe .n{font-size:30px;font-weight:790;letter-spacing:-.03em;color:var(--ink);line-height:1}
+  .pipe .s{font-size:12.5px;color:var(--text-2);margin-top:7px;font-weight:600}
+  .pipe.key{background:linear-gradient(160deg,var(--orange-soft),#fff);border-color:#f8d6bd}
+  .pipe.key .n{color:var(--orange-deep)}
+  .pipe.zero{opacity:.5}
+  .pipe.zero .n{color:var(--text-3)}
+  .pipe.can-open{cursor:pointer}
+  .pipe.can-open:hover{border-color:var(--orange);box-shadow:0 6px 20px rgba(242,104,31,.16)}
+  .pipe .go{margin-top:9px;font-size:11.5px;font-weight:700;color:var(--orange);
+    opacity:0;transition:opacity .15s}
+  .pipe.can-open:hover .go{opacity:1}
+  .pipe-toggle{grid-column:1/-1;justify-self:start;border:1px dashed var(--border-2);
+    background:transparent;color:var(--text-2);font:inherit;font-size:12.5px;font-weight:650;
+    padding:9px 16px;border-radius:11px;cursor:pointer;transition:.15s}
+  .pipe-toggle:hover{border-color:var(--orange);color:var(--orange);background:var(--orange-soft)}
+  /* disposition filter chips inside the drill-down */
+  .dispbar{display:flex;flex-wrap:wrap;gap:7px;padding:14px 26px;border-bottom:1px solid var(--border);
+    background:var(--surface-2)}
+  .dchip{border:1px solid var(--border);background:var(--surface);color:var(--text-1);font:inherit;
+    font-size:12.5px;font-weight:650;padding:5px 12px;border-radius:999px;cursor:pointer;transition:.14s}
+  .dchip:hover{border-color:var(--orange);color:var(--orange)}
+  .dchip.on{background:linear-gradient(135deg,var(--orange-2),var(--orange));color:#fff;border-color:transparent}
+  .dchip .c{opacity:.75;margin-left:5px;font-weight:600}
+  .disp{display:inline-block;padding:3px 10px;border-radius:999px;font-size:12.5px;font-weight:650}
+  .disp.logged{background:var(--orange-soft);color:var(--orange-deep);border:1px solid #f8d6bd}
+  .disp.auto{background:var(--surface-2);color:var(--text-3);border:1px solid var(--border)}
+  .warn{background:#fff7ed;border:1px solid #fcd9b6;border-left:4px solid var(--orange);
+    border-radius:12px;padding:13px 18px;margin-bottom:18px;font-size:13.5px;color:#8a4a12}
+  .warn strong{color:#6b3a0e}
+  .warn[hidden]{display:none}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="top">
+    <div class="brand">
+      <div class="mark">S</div>
+      <div>
+        <h1>Swimm <span>·</span> Activity Dashboard</h1>
+        <div class="sub">Outbound performance · powered by Amiy</div>
+      </div>
+    </div>
+    <div class="topright">
+      <div class="live"><span class="dot"></span><span id="live-label">loading…</span></div>
+      <button class="signout" id="signout" hidden><span id="whoami"></span>Sign out</button>
+    </div>
+  </div>
+
+  <div class="controls" id="controls" style="display:none">
+    <div class="seg" id="win-seg">
+      <button data-win="today">Today</button>
+      <button data-win="7">7 days</button>
+      <button data-win="30" class="active">30 days</button>
+      <button data-win="all">All</button>
+      <button data-win="custom">Custom</button>
+    </div>
+    <span class="custom" id="custom-box">
+      <input type="date" id="d-from"> <span>→</span> <input type="date" id="d-to">
+    </span>
+    <button class="reload" id="reload-btn">↻ Reload</button>
+    <div class="range-label" id="range-label"></div>
+  </div>
+
+  <div id="warn" class="warn" hidden></div>
+
+  <div id="state"><div class="spin"></div>Loading Swimm activity…</div>
+
+  <div id="dash" style="display:none">
+    <div class="kpis">
+      <div class="kpi"><div class="label">Calls Made</div><div class="value" id="k-calls">—</div><div class="meta" id="k-calls-m"></div></div>
+      <div class="kpi"><div class="label">Emails Sent</div><div class="value" id="k-emails">—</div><div class="meta" id="k-emails-m"></div></div>
+      <div class="kpi"><div class="label">Active Sequences</div><div class="value" id="k-seq">—</div><div class="meta">total in account</div></div>
+      <div class="kpi"><div class="label">Active SDRs</div><div class="value" id="k-sdrs">—</div><div class="meta">with activity in range</div></div>
+    </div>
+
+    <div class="panel" id="pipe-panel" hidden>
+      <h2>Pipeline · Contact Stages <span class="tag" id="pipe-tag"></span></h2>
+      <div class="pipe-grid" id="pipe-grid"></div>
+      <div class="note">Live count of contacts sitting in each Apollo contact stage right now. This is a snapshot of where the pipeline stands — it is not filtered by the date range above.</div>
+    </div>
+
+    <div class="panel">
+      <h2>Call Metrics per SDR <span class="tag" id="calls-tag"></span></h2>
+      <div class="scroll">
+        <table id="sdr-tbl">
+          <thead><tr>
+            <th data-k="sdr">SDR</th>
+            <th class="no-sort">Call volume</th>
+            <th class="num" data-k="calls">Calls</th>
+            <th class="num" data-k="connected">Connected</th>
+            <th class="num" data-k="perday">Avg / active day</th>
+            <th class="num" data-k="days">Active days</th>
+            <th class="num" data-k="share">Share of calls</th>
+            <th class="num talk" data-k="secs">Talk time</th>
+          </tr></thead>
+          <tbody id="sdr-body"></tbody>
+        </table>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="foot" id="foot" style="display:none">
+    Last synced <span id="foot-time">—</span> · Swimm · <a href="https://amiy.io" target="_blank" rel="noopener">amiy.io</a>
+  </div>
+</div>
+
+<!-- ── Connected-calls drill-down ── -->
+<div class="modal-back" id="cc-back" hidden>
+  <div class="modal" role="dialog" aria-modal="true">
+    <div class="modal-head">
+      <div>
+        <div class="modal-title" id="cc-title">Connected calls</div>
+        <div class="modal-sub" id="cc-sub"></div>
+      </div>
+      <button class="modal-x" id="cc-close" aria-label="Close">&times;</button>
+    </div>
+    <div class="dispbar" id="cc-filters"></div>
+    <div class="modal-body">
+      <div class="scroll">
+        <table id="cc-tbl" style="min-width:820px">
+          <thead><tr>
+            <th class="no-sort">When</th>
+            <th class="no-sort">Contact</th>
+            <th class="num no-sort">Duration</th>
+            <th class="no-sort">Outcome</th>
+            <th class="no-sort">Notes</th>
+            <th class="no-sort">Recording</th>
+          </tr></thead>
+          <tbody id="cc-body"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+  // Both go through /api/feed, which requires a session cookie — there is no
+  // public URL for this data. FAST_URL returns the payload baked into the
+  // deployment (instant); LIVE_URL asks it to pull the nightly-refreshed copy.
+  var FAST_URL="/api/feed", LIVE_URL="/api/feed?live=1";
+  var D=null, win="30", sortK="calls", sortDir="desc";
+
+  function fmt(n){return (n==null?0:n).toLocaleString();}
+  function esc(s){return String(s==null?"":s).replace(/[&<>"]/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c];});}
+  function ago(iso){if(!iso)return"—";var d=new Date(iso),s=Math.floor((Date.now()-d)/1000);
+    if(s<60)return"just now";if(s<3600)return Math.floor(s/60)+" min ago";
+    if(s<86400)return Math.floor(s/3600)+"h ago";return d.toLocaleDateString();}
+  function iso(d){return d.toISOString().slice(0,10);}
+  function hms(sec){
+    if(!sec) return "—";
+    var h=Math.floor(sec/3600), m=Math.round((sec%3600)/60);
+    return h? (h+"h "+m+"m") : (m+"m");
+  }
+
+  function range(){
+    var lo=D.date_min, hi=D.date_max, today=iso(new Date());
+    if(win==="today"){ lo=today; hi=today; }
+    else if(win==="7"||win==="30"){
+      var d=new Date(); d.setDate(d.getDate()-(parseInt(win,10)-1));
+      lo=iso(d); hi=today;
+    } else if(win==="custom"){
+      lo=document.getElementById("d-from").value||D.date_min;
+      hi=document.getElementById("d-to").value||D.date_max;
+    }
+    if(lo<D.date_min) lo=D.date_min;
+    return {lo:lo,hi:hi};
+  }
+
+  function render(){
+    if(!D) return;
+    var r=range();
+    document.getElementById("range-label").textContent =
+      "Showing "+r.lo+" → "+r.hi+"  ·  data available "+D.date_min+" → "+D.date_max;
+
+    var sdr={}, totalCalls=0, totalSecs=0, totalConn=0;
+    (D.calls_daily||[]).forEach(function(x){
+      if(x.date<r.lo||x.date>r.hi) return;
+      var s=sdr[x.sdr]||(sdr[x.sdr]={sdr:x.sdr,calls:0,secs:0,days:0,connected:0});
+      s.calls+=x.count; s.secs+=(x.secs||0); s.days++; s.connected+=(x.connected||0);
+      totalCalls+=x.count; totalSecs+=(x.secs||0); totalConn+=(x.connected||0);
+    });
+
+    var em={}, totalEmails=0, totalOpened=0;
+    (D.emails_daily||[]).forEach(function(x){
+      if(x.date<r.lo||x.date>r.hi) return;
+      var e=em[x.sdr]||(em[x.sdr]={sdr:x.sdr,emails:0,opened:0});
+      e.emails += x.count;
+      e.opened += (x.opened||0);
+      totalEmails += x.count;
+      totalOpened += (x.opened||0);
+    });
+
+    var list=Object.keys(sdr).map(function(k){
+      var s=sdr[k];
+      s.perday = s.days? s.calls/s.days : 0;
+      s.share  = totalCalls? s.calls/totalCalls*100 : 0;
+      return s;
+    });
+    list.sort(function(a,b){
+      if(sortK==="sdr") return sortDir==="asc"? a.sdr.localeCompare(b.sdr):b.sdr.localeCompare(a.sdr);
+      return sortDir==="asc"? a[sortK]-b[sortK] : b[sortK]-a[sortK];
+    });
+
+    var hasTalk = totalSecs>0;
+    document.querySelectorAll("#sdr-tbl .talk").forEach(function(el){ el.style.display = hasTalk?"":"none"; });
+
+    document.getElementById("k-calls").textContent  = fmt(totalCalls);
+    document.getElementById("k-emails").textContent = fmt(totalEmails);
+    document.getElementById("k-seq").textContent    = fmt(D.sequences);
+    var act=new Set(Object.keys(sdr).concat(Object.keys(em))); act.delete("");
+    document.getElementById("k-sdrs").textContent   = fmt(act.size);
+    var lbl=(win==="today"?"today":win==="all"?"all available data":r.lo+" → "+r.hi);
+    document.getElementById("k-calls-m").textContent = lbl;
+    document.getElementById("k-emails-m").textContent= lbl;
+    document.getElementById("calls-tag").textContent = fmt(totalCalls)+" calls"+
+      (totalConn? " · "+fmt(totalConn)+" connected ("+Math.round(totalConn/totalCalls*100)+"%)":"")+
+      (hasTalk?" · "+hms(totalSecs)+" talk time":"");
+
+    var maxC=list.length? Math.max.apply(null,list.map(function(s){return s.calls;})):1;
+    document.getElementById("sdr-body").innerHTML = list.length? list.map(function(s){
+      var pct=Math.max(4,Math.round(s.calls/maxC*100));
+      var mail=(D.sdr_emails&&D.sdr_emails[s.sdr])?'<span class="mail">'+esc(D.sdr_emails[s.sdr])+'</span>':'';
+      var connCell = s.connected
+        ? '<a href="#" class="conn-link" data-sdr="'+esc(s.sdr)+'">'+fmt(s.connected)+'</a>'
+        : '0';
+      return '<tr><td class="sdr">'+esc(s.sdr)+mail+'</td>'+
+        '<td><div class="bar"><span style="width:'+pct+'%"></span></div></td>'+
+        '<td class="num">'+fmt(s.calls)+'</td>'+
+        '<td class="num">'+connCell+'</td>'+
+        '<td class="num">'+s.perday.toFixed(1)+'</td>'+
+        '<td class="num">'+fmt(s.days)+'</td>'+
+        '<td class="num"><span class="share">'+s.share.toFixed(1)+'%</span></td>'+
+        '<td class="num talk"'+(hasTalk?'':' style="display:none"')+'>'+hms(s.secs)+'</td></tr>';
+    }).join("") : '<tr><td colspan="8" class="empty">No calls in this date range.</td></tr>';
+
+    renderPipeline();
+
+    // Surface partial-fetch problems instead of silently showing zeros.
+    var w=document.getElementById("warn");
+    var errs=(D.errors||[]).filter(function(e){ return !/users list/i.test(e); });
+    if(errs.length && totalCalls===0){
+      w.innerHTML='<strong>Call data could not be loaded on the last sync.</strong> '+
+        'Apollo returned: '+esc(errs.join(" · "))+'. Emails below are still accurate. '+
+        'The next hourly sync will retry.';
+      w.hidden=false;
+    } else if(errs.length){
+      w.innerHTML='<strong>Partial sync.</strong> '+esc(errs.join(" · "));
+      w.hidden=false;
+    } else { w.hidden=true; }
+
+    document.getElementById("live-label").textContent="live · "+ago(D.generated_at);
+    document.getElementById("foot-time").textContent=D.generated_at?new Date(D.generated_at).toLocaleString():"—";
+  }
+
+  function show(v){
+    document.getElementById("state").style.display=(v==="load"||v==="err")?"":"none";
+    document.getElementById("dash").style.display=v==="ok"?"":"none";
+    document.getElementById("controls").style.display=v==="ok"?"flex":"none";
+    document.getElementById("foot").style.display=v==="ok"?"":"none";
+  }
+
+  // Any 401 means the session expired or was never there — go and sign in,
+  // remembering nothing sensitive was rendered.
+  function toLogin(){ location.replace("/login"); }
+
+  function get(url){
+    return fetch(url+(url.indexOf("?")<0?"?":"&")+"t="+Date.now(),
+                 {credentials:"same-origin"})
+      .then(function(r){
+        if(r.status===401){ toLogin(); throw new Error("not signed in"); }
+        if(!r.ok) throw new Error("HTTP "+r.status);
+        return r.json();
+      })
+      .then(function(j){
+        if(j && j.error && !j.calls_daily) throw new Error(j.error);
+        return j;
+      });
+  }
+
+  function fetchLive(){
+    return get(LIVE_URL).then(function(j){
+      if(!j || !j.calls_daily) throw new Error("live payload malformed");
+      return j;
+    });
+  }
+
+  // Baked copy first (instant), then quietly upgrade to the freshly-synced one
+  // in the background. A cold sync can take minutes; nobody should stare at a
+  // spinner for that.
+  function fetchPayload(){
+    return get(FAST_URL);
+  }
+
+  function markRefreshing(on){
+    var el=document.getElementById("live-label");
+    if(!el) return;
+    if(on){ el.dataset.prev=el.textContent; el.textContent="refreshing…"; }
+    else if(el.dataset.prev){ el.textContent=el.dataset.prev; }
+  }
+
+  function upgradeToLive(){
+    markRefreshing(true);
+    fetchLive().then(function(j){
+      if(j && j.calls_daily){ D=j; render(); }   // swap in fresher numbers
+      markRefreshing(false);
+    }).catch(function(){ markRefreshing(false); });
+  }
+
+  function load(){
+    show("load");
+    document.getElementById("state").innerHTML='<div class="spin"></div>Loading Swimm activity…';
+    fetchPayload()
+      .then(function(j){
+        if(!j || !j.calls_daily){
+          show("err");
+          document.getElementById("state").innerHTML='<div class="err-box">'+
+            '<strong>Payload is from an older build.</strong><br>'+
+            'This dashboard needs the daily-bucket format (and real SDR names).<br><br>'+
+            'Run <code>python3 build_swimm.py</code> in the project folder, then redeploy.</div>';
+          return;
+        }
+        D=j; show("ok");
+        ["d-from","d-to"].forEach(function(id){
+          var el=document.getElementById(id); el.min=D.date_min; el.max=D.date_max;
+        });
+        document.getElementById("d-from").value=D.date_min;
+        document.getElementById("d-to").value=D.date_max;
+        render();
+        upgradeToLive();      // page is already usable; refresh it in the background
+      })
+      .catch(function(e){
+        show("err");
+        document.getElementById("state").innerHTML='<div class="err-box"><strong>Could not load data.</strong><br>'+
+          esc(e.message)+'<br><br>Run <code>python3 build_swimm.py</code> and redeploy.</div>';
+      });
+  }
+
+  document.getElementById("win-seg").addEventListener("click",function(e){
+    var b=e.target.closest("button"); if(!b) return;
+    [].forEach.call(this.children,function(c){c.classList.remove("active");});
+    b.classList.add("active"); win=b.dataset.win;
+    document.getElementById("custom-box").classList.toggle("on",win==="custom");
+    render();
+  });
+  document.getElementById("d-from").addEventListener("change",render);
+  document.getElementById("d-to").addEventListener("change",render);
+  document.getElementById("reload-btn").addEventListener("click",load);
+
+  // ── Pipeline ───────────────────────────────────────────────────────────────
+  // Funnel order first, then everything else with contacts, then the empty
+  // stages tucked behind a toggle — 15 zero cards is noise, not information.
+  var FUNNEL = ["interested","meeting scheduled","meeting qualified",
+                "meeting disqualified","follow up","hot lead","replied"];
+  var _showEmpty = false;
+
+  function renderPipeline(){
+    var pipe = D.pipeline || [];
+    var pp = document.getElementById("pipe-panel");
+    if(!pipe.length){ pp.hidden = true; return; }
+    pp.hidden = false;
+
+    var rank = function(s){
+      var i = FUNNEL.indexOf(s.stage.toLowerCase());
+      return i >= 0 ? i : 100;
+    };
+    var sorted = pipe.slice().sort(function(a,b){
+      var d = rank(a) - rank(b);
+      return d !== 0 ? d : b.count - a.count;
+    });
+    var filled = sorted.filter(function(s){ return s.count > 0; });
+    var empty  = sorted.filter(function(s){ return s.count === 0; });
+    var show   = _showEmpty ? filled.concat(empty) : filled;
+
+    document.getElementById("pipe-grid").innerHTML = show.map(function(s){
+      var isKey = FUNNEL.indexOf(s.stage.toLowerCase()) >= 0;
+      var can   = (s.contacts && s.contacts.length) ? " can-open" : "";
+      return '<div class="pipe'+(isKey?" key":"")+(s.count===0?" zero":"")+can+'"'+
+        (can? ' data-stage="'+esc(s.stage)+'" title="Click to see the contacts"':'')+'>'+
+        '<div class="n">'+fmt(s.count)+'</div>'+
+        '<div class="s">'+esc(s.stage)+'</div>'+
+        (can? '<div class="go">view '+s.contacts.length+' →</div>':'')+
+        '</div>';
+    }).join("") +
+      (empty.length ? '<button class="pipe-toggle" id="pipe-toggle">'+
+        (_showEmpty ? "hide" : "show")+' '+empty.length+' empty stage'+
+        (empty.length!==1?"s":"")+'</button>' : "");
+
+    var tot = pipe.reduce(function(a,b){ return a+b.count; }, 0);
+    document.getElementById("pipe-tag").textContent =
+      fmt(tot)+" contacts · "+filled.length+" active stage"+(filled.length!==1?"s":"");
+  }
+
+  document.getElementById("pipe-grid").addEventListener("click", function(e){
+    if(e.target.closest("#pipe-toggle")){ _showEmpty = !_showEmpty; renderPipeline(); return; }
+    var card = e.target.closest(".pipe.can-open");
+    if(card) openStage(card.dataset.stage);
+  });
+
+  // Stage → contacts, each with the SDR who owns them and any call recording.
+  function openStage(stageName){
+    var st = (D.pipeline||[]).filter(function(s){ return s.stage===stageName; })[0];
+    if(!st) return;
+    var people = st.contacts || [];
+
+    // index connected calls by contact name so we can attach SDR + recording
+    var byName = {};
+    (D.connected_calls||[]).forEach(function(c){
+      var k = (c.contact||"").toLowerCase().trim();
+      if(!k) return;
+      if(!byName[k] || (c.secs||0) > (byName[k].secs||0)) byName[k] = c;   // keep longest
+    });
+
+    document.getElementById("cc-title").textContent = stageName;
+    document.getElementById("cc-sub").textContent =
+      people.length+" contact"+(people.length!==1?"s":"")+" in this stage";
+    document.getElementById("cc-filters").style.display = "none";
+
+    document.querySelector("#cc-tbl thead").innerHTML =
+      '<tr><th class="no-sort">Contact</th><th class="no-sort">Company</th>'+
+      '<th class="no-sort">Title</th><th class="no-sort">SDR</th>'+
+      '<th class="no-sort">Last call</th><th class="no-sort">Recording</th></tr>';
+
+    document.getElementById("cc-body").innerHTML = people.length ? people.map(function(p){
+      var call = byName[(p.name||"").toLowerCase().trim()];
+      var sdr  = p.owner || (call ? call.sdr : "");
+      var rec  = call && call.rec
+        ? '<button class="play play-btn" data-src="'+esc(call.rec)+'">▶ Play</button>'
+        : '<span class="muted">—</span>';
+      var last = call ? esc(call.date)+' <span class="muted">'+hms(call.secs)+'</span>'
+                      : '<span class="muted">—</span>';
+      var nm = p.url
+        ? '<a class="maya-link" href="'+esc(p.url)+'" target="_blank" rel="noopener">'+esc(p.name||"—")+'</a>'
+        : esc(p.name||"—");
+      return '<tr><td class="sdr">'+nm+
+        (p.email? '<span class="mail">'+esc(p.email)+'</span>':'')+'</td>'+
+        '<td>'+esc(p.company||"—")+'</td>'+
+        '<td class="note-cell">'+esc(p.title||"—")+'</td>'+
+        '<td>'+(sdr? esc(sdr) : '<span class="muted">—</span>')+'</td>'+
+        '<td class="nowrap">'+last+'</td>'+
+        '<td class="nowrap">'+rec+'</td></tr>';
+    }).join("")
+      : '<tr><td colspan="6" class="empty">No contact detail stored for this stage.</td></tr>';
+
+    document.getElementById("cc-back").hidden = false;
+  }
+
+  // ── Connected-calls drill-down ─────────────────────────────────────────────
+  var _ccRows = [], _ccSdr = "", _ccFilter = null;   // null = show every disposition
+
+  function openConnected(sdrName){
+    var r=range();
+    _ccSdr = sdrName;
+    _ccFilter = null;
+    _ccRows = (D.connected_calls||[]).filter(function(c){
+      return c.sdr===sdrName && c.date>=r.lo && c.date<=r.hi;
+    });
+    document.getElementById("cc-title").textContent = sdrName + " · connected calls";
+    // restore this view's own columns (openStage swaps them out)
+    document.querySelector("#cc-tbl thead").innerHTML =
+      '<tr><th class="no-sort">When</th><th class="no-sort">Contact</th>'+
+      '<th class="num no-sort">Duration</th><th class="no-sort">Outcome</th>'+
+      '<th class="no-sort">Notes</th><th class="no-sort">Recording</th></tr>';
+    renderCCFilters();
+    renderCC();
+    document.getElementById("cc-back").hidden=false;
+  }
+
+  function renderCCFilters(){
+    var counts={};
+    _ccRows.forEach(function(c){
+      var k=c.outcome||"—"; counts[k]=(counts[k]||0)+1;
+    });
+    var keys=Object.keys(counts).sort(function(a,b){return counts[b]-counts[a];});
+    var bar=document.getElementById("cc-filters");
+    if(keys.length<2){ bar.innerHTML=""; bar.style.display="none"; return; }
+    bar.style.display="flex";
+    bar.innerHTML =
+      '<button class="dchip'+(_ccFilter===null?' on':'')+'" data-d="">All'+
+        '<span class="c">'+_ccRows.length+'</span></button>' +
+      keys.map(function(k){
+        return '<button class="dchip'+(_ccFilter===k?' on':'')+'" data-d="'+esc(k)+'">'+
+          esc(k)+'<span class="c">'+counts[k]+'</span></button>';
+      }).join("");
+  }
+
+  function renderCC(){
+    var rows = _ccFilter===null ? _ccRows
+             : _ccRows.filter(function(c){ return (c.outcome||"—")===_ccFilter; });
+    var r=range();
+    var totalSec=rows.reduce(function(a,b){return a+(b.secs||0);},0);
+    document.getElementById("cc-sub").textContent =
+      rows.length+" call"+(rows.length!==1?"s":"")+" · "+hms(totalSec)+" talk time · "+r.lo+" → "+r.hi+
+      (_ccFilter?"  ·  filtered: "+_ccFilter:"");
+
+    document.getElementById("cc-body").innerHTML = rows.length ? rows.map(function(c){
+      var rec = c.rec
+        ? '<button class="play play-btn" data-src="'+esc(c.rec)+'">▶ Play</button>'
+        : '<span class="muted">—</span>';
+      var who = c.contact ? esc(c.contact) : (c.phone? esc(c.phone) : '<span class="muted">—</span>');
+      var sub = (c.contact && c.phone) ? '<span class="mail">'+esc(c.phone)+'</span>' : '';
+      return '<tr>'+
+        '<td class="nowrap">'+esc(c.date)+' <span class="muted">'+esc(c.at||'')+'</span></td>'+
+        '<td class="sdr">'+who+sub+'</td>'+
+        '<td class="num nowrap">'+hms(c.secs)+'</td>'+
+        '<td class="nowrap">'+(c.logged
+            ? '<span class="disp logged">'+esc(c.outcome)+'</span>'
+            : '<span class="disp auto" title="Rep did not log a disposition — this is the telephony status">'+esc(c.outcome||'—')+'</span>')+'</td>'+
+        '<td class="note-cell">'+(c.note? esc(c.note):'<span class="muted">—</span>')+'</td>'+
+        '<td class="nowrap">'+rec+'</td></tr>';
+    }).join("") : '<tr><td colspan="6" class="empty">No calls match this filter.</td></tr>';
+  }
+
+  document.getElementById("cc-filters").addEventListener("click",function(e){
+    var b=e.target.closest(".dchip"); if(!b) return;
+    _ccFilter = b.dataset.d || null;
+    renderCCFilters(); renderCC();
+  });
+
+  function closeConnected(){ document.getElementById("cc-back").hidden=true; }
+
+  document.getElementById("sdr-body").addEventListener("click",function(e){
+    var a=e.target.closest(".conn-link");
+    if(!a) return;
+    e.preventDefault();
+    openConnected(a.dataset.sdr);
+  });
+  // Play button → swap in a real <audio> element, lazily. Loading 700 players
+  // up front would be brutal; this fetches only the one you asked for, and
+  // stops whatever else was playing.
+  document.getElementById("cc-body").addEventListener("click", function(e){
+    var b = e.target.closest(".play-btn");
+    if(!b) return;
+    document.querySelectorAll("audio.rec").forEach(function(a){ a.pause(); });
+    var au = document.createElement("audio");
+    au.className = "rec";
+    au.controls = true;
+    au.preload = "auto";
+    au.src = b.dataset.src;
+    au.onerror = function(){
+      au.replaceWith(Object.assign(document.createElement("span"),
+        {className:"muted", textContent:"recording unavailable"}));
+    };
+    b.replaceWith(au);
+    au.play().catch(function(){});   // ignore autoplay blocks; controls still work
+  });
+
+  document.getElementById("cc-close").addEventListener("click",closeConnected);
+  document.getElementById("cc-back").addEventListener("click",function(e){
+    if(e.target===this) closeConnected();          // click the backdrop to dismiss
+  });
+  document.addEventListener("keydown",function(e){
+    if(e.key==="Escape") closeConnected();
+  });
+
+  // Data is refreshed once nightly, so a long poll is enough — this only picks
+  // up the new nightly payload for a tab that was left open. Hits cache, cheap.
+  var AUTO_MS = 900000;   // 15 min
+  function silentRefresh(){
+    if(document.hidden) return;                 // don't poll a background tab
+    fetchLive().then(function(j){
+      if(j && j.calls_daily){ D=j; render(); }  // swap data in place, no flicker
+    }).catch(function(){});
+  }
+  setInterval(silentRefresh, AUTO_MS);
+  document.addEventListener("visibilitychange",function(){
+    if(!document.hidden) silentRefresh();        // refresh the moment you return
+  });
+  setInterval(function(){                        // keep the "x min ago" label honest
+    if(D) document.getElementById("live-label").textContent="live · "+ago(D.generated_at);
+  }, 30000);
+  document.querySelector("#sdr-tbl thead").addEventListener("click",function(e){
+    var th=e.target.closest("th[data-k]"); if(!th) return;
+    var k=th.dataset.k;
+    if(sortK===k){ sortDir=sortDir==="desc"?"asc":"desc"; }
+    else { sortK=k; sortDir=(k==="sdr")?"asc":"desc"; }
+    render();
+  });
+
+  // ── session ────────────────────────────────────────────────────────────────
+  document.getElementById("signout").addEventListener("click",function(){
+    fetch("/api/logout",{credentials:"same-origin"})
+      .then(toLogin).catch(toLogin);
+  });
+
+  // Confirm the session before painting anything. If it's gone we bounce to the
+  // login page without ever having drawn a number on screen.
+  fetch("/api/login",{credentials:"same-origin"})
+    .then(function(r){ return r.json(); })
+    .then(function(j){
+      if(!j || !j.auth){ toLogin(); return; }
+      var b=document.getElementById("signout");
+      document.getElementById("whoami").textContent=j.email||"";
+      b.hidden=false;
+      load();
+    })
+    .catch(function(){ load(); });   // network hiccup: let load() decide
+})();
+</script>
+</body>
+</html>

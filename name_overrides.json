@@ -1,0 +1,21 @@
+{
+  "_comment": "Only needed when the real surname is NOT in the email. The build already derives names smartly (bar.danosh@ -> 'Bar Danosh', bard+amiy@ -> 'Bard', 'gent isaku' -> 'Gent Isaku'). But art.q@ can only become 'Art Q' - the surname isn't in the address, so put it here. Key = email (lowercase) or Apollo user id. These win over everything.",
+
+  "art.q@getswimm.io": "Art Qorrolli",
+  "gentian.e@getswimm.io": "Gentian Elezi",
+  "gent.i@getswimm.io": "Gent Isaku",
+  "arb.a@getswimm.io": "Arb Aliu",
+  "bard+amiy@swimm.io": "Bar Danosh",
+
+  "_fill_in_real_surnames_below": "replace the value with the full name when you know it",
+  "adi.h@getswimm.io": "Adi H",
+  "sean.k@getswimm.io": "Sean K",
+  "jona.k@getswimm.io": "Jona K",
+  "fat.g@getswimm.io": "Fat G",
+  "trevor.k@getswimm.io": "Trevor K",
+  "mac.t@getswimm.io": "Mac T",
+  "aleksia.b@getswimm.io": "Aleksia B",
+  "dafina.m@getswimm.io": "Dafina M",
+  "mirjeta@getswimm.io": "Mirjeta",
+  "oguzhan.g+swimm@amiy.io": "Ozzy G"
+}

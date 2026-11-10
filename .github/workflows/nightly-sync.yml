@@ -1,0 +1,50 @@
+name: Nightly Swimm sync
+
+on:
+  schedule:
+    - cron: "0 1 * * *"
+  workflow_dispatch:
+
+concurrency:
+  group: swimm-sync
+  cancel-in-progress: false
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Build the payload from Apollo
+        env:
+          APOLLO_SWIMM_KEY: ${{ secrets.APOLLO_SWIMM_KEY }}
+          SWIMM_429_ATTEMPTS: "9"
+          SWIMM_429_MAX_SLEEP: "300"
+        run: python3 build_swimm.py --days 30
+
+      - name: Refuse to deploy a failed sync
+        run: python3 check_payload.py --max-age-hours 6
+
+      - name: Deploy to Vercel
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          VERCEL_ORG_ID: team_o2TrDSaneXlFRR8HPOO0P9Eq
+          VERCEL_PROJECT_ID: prj_m3Ya1pAPJpf3Yf3zb9GLleW5k8zM
+        run: |
+          rm -rf .git .gitignore
+          npx --yes vercel@latest deploy --prod --yes --token="$VERCEL_TOKEN"
+
+      - name: Keep the payload as an artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: swimm-payload-${{ github.run_number }}
+          path: swimm-payload.json
+          retention-days: 14
+          if-no-files-found: warn
